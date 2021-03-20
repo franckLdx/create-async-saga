@@ -1,4 +1,4 @@
-import { createAsyncSagaActions } from "./actions";
+import { createAsyncSagaActions } from "./toolkitActions";
 import { put } from "redux-saga/effects";
 
 interface CreateAsyncSagaProps<ARG, RESULT> {
