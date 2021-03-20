@@ -1,18 +1,18 @@
 import { createAction, SerializedError } from "@reduxjs/toolkit";
 
-export const createAsyncSagaActions = <ARG = void, RESULT = void>(name: string) => {
-  const meta = (arg: ARG) => ({ meta: { arg: arg } });
+export function createAsyncSagaActions<Returned = void, SagaArg = void>(typePrefix: string) {
+  const meta = (arg: SagaArg) => ({ meta: { arg: arg } });
   return {
-    action: createAction<ARG>(name),
-    pending: createAction(`${name}/pending`, (arg: ARG) => ({
+    action: createAction<SagaArg>(typePrefix),
+    pending: createAction(`${typePrefix}/pending`, (arg: SagaArg) => ({
       payload: undefined,
       ...meta(arg)
     })),
-    fulfilled: createAction(`${name}/fulfilled`, (arg: ARG, result: RESULT) => ({
+    fulfilled: createAction(`${typePrefix}/fulfilled`, (arg: SagaArg, result: Returned) => ({
       payload: result,
       ...meta(arg)
     })),
-    rejected: createAction(`${name}/rejected`, (arg: ARG, error: SerializedError) => ({
+    rejected: createAction(`${typePrefix}/rejected`, (arg: SagaArg, error: SerializedError) => ({
       payload: error,
       ...meta(arg)
     })),

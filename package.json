@@ -12,6 +12,7 @@
     "eslint": "^7.22.0",
     "install-peers-cli": "^2.2.0",
     "jest": "^26.6.3",
+    "redux-saga-test-plan": "^4.0.1",
     "rimraf": "^3.0.2",
     "ts-jest": "^26.5.4",
     "ts-node": "^9.1.1",
@@ -25,5 +26,25 @@
     "prepare": "install-peers",
     "build": "rimraf ./dist && tsc",
     "test": "jest"
-  }
+  },
+  "files": [
+    "lib/**/*.js",
+    "lib/**/*.d.ts",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "typescript",
+    "javascript",
+    "react",
+    "redux",
+    "react-redux",
+    "redux-toolkit",
+    "redux",
+    "saga",
+    "redux-saga",
+    "createAsyncThunk",
+    "createAsyncSaga"
+  ]
 }

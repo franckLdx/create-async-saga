@@ -1,28 +1,26 @@
 import { createAsyncSagaActions } from "./toolkitActions";
 import { put } from "redux-saga/effects";
 
-interface CreateAsyncSagaProps<ARG, RESULT> {
-  name: string;
-  generator: (arg: ARG) => Generator<any, RESULT, any>;
-  condition?: (arg: ARG) => any;
+interface AsyncSagaOptions<SagaArg> {
+  condition?: (arg: SagaArg) => Generator<any, boolean, any>
 }
 
-export const createAsyncSaga = <ARG = void, RESULT = void>({ name, generator, condition }: CreateAsyncSagaProps<ARG, RESULT>) => {
-  const actions = createAsyncSagaActions<ARG, RESULT>(name);
+export function createAsyncSaga<Returned, SagaArg>(typePrefix: string, payloadCreator: (arg: SagaArg) => Generator<any, Returned, any>, options?: AsyncSagaOptions<SagaArg>) {
+  const actions = createAsyncSagaActions<Returned, SagaArg>(typePrefix);
   type TriggerAction = ReturnType<typeof actions.action>;
 
   const asyncSaga = function* ({ payload }: TriggerAction) {
-    const execute = condition ? yield* condition(payload) : true;
+    const execute = options?.condition ? yield* options?.condition(payload) : true;
     if (!execute) {
       return;
     }
     yield put(actions.pending(payload));
     try {
-      const gen = generator(payload);
-      let next = gen.next();
+      const payloadGenerator = payloadCreator(payload);
+      let next = payloadGenerator.next();
       while (!next.done) {
         const tmp: unknown = yield next.value;
-        next = gen.next(tmp);
+        next = payloadGenerator.next(tmp);
       }
       const result = next.value;
       yield put(actions.fulfilled(payload, result));
@@ -35,4 +33,4 @@ export const createAsyncSaga = <ARG = void, RESULT = void>({ name, generator, co
     ...actions, asyncSaga
   }
 
-};
+}
