@@ -9,12 +9,16 @@
   "dependencies": {},
   "devDependencies": {
     "eslint": "^7.22.0",
+    "install-peers-cli": "^2.2.0",
+    "rimraf": "^3.0.2",
     "typescript": "^4.2.3"
   },
   "peerDependencies": {
     "@reduxjs/toolkit": "^1.5.0",
-    "react-redux": "^7.2.2",
-    "redux-saga": "^1.1.3",
-    "redux-toolkit": "^1.1.2"
+    "redux-saga": "^1.1.3"
+  },
+  "scripts": {
+    "prepare": "install-peers",
+    "build": "rimraf ./dist && tsc"
   }
 }
