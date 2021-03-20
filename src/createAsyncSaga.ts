@@ -6,15 +6,15 @@ interface AsyncSagaOptions<SagaArg> {
 }
 
 export function createAsyncSaga<Returned, SagaArg>(typePrefix: string, payloadCreator: (arg: SagaArg) => Generator<any, Returned, any>, options?: AsyncSagaOptions<SagaArg>) {
-  const actions = createAsyncSagaActions<Returned, SagaArg>(typePrefix);
-  type TriggerAction = ReturnType<typeof actions.action>;
+  const { action, pending, fulfilled, rejected } = createAsyncSagaActions<Returned, SagaArg>(typePrefix);
+  type TriggerAction = ReturnType<typeof action>;
 
   const asyncSaga = function* ({ payload }: TriggerAction) {
     const execute = options?.condition ? yield* options?.condition(payload) : true;
     if (!execute) {
       return;
     }
-    yield put(actions.pending(payload));
+    yield put(pending(payload));
     try {
       const payloadGenerator = payloadCreator(payload);
       let next = payloadGenerator.next();
@@ -23,14 +23,16 @@ export function createAsyncSaga<Returned, SagaArg>(typePrefix: string, payloadCr
         next = payloadGenerator.next(tmp);
       }
       const result = next.value;
-      yield put(actions.fulfilled(payload, result));
+      yield put(fulfilled(payload, result));
     } catch (err) {
-      yield put(actions.rejected(payload, err));
+      yield put(rejected(payload, err));
     }
   }
 
   return {
-    ...actions, asyncSaga
-  }
+    actionType: action.type,
+    action, pending, fulfilled, rejected,
+    asyncSaga,
+  };
 
 }
