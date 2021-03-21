@@ -1,12 +1,8 @@
 import { createAsyncSagaActions } from "./toolkitActions";
 import { put } from "redux-saga/effects";
 
-interface AsyncSagaOptions<SagaArg> {
-  condition?: (arg: SagaArg) => Generator<any, boolean, any>
-}
-
-export function createAsyncSaga<Returned, SagaArg>(typePrefix: string, payloadCreator: (arg: SagaArg) => Generator<any, Returned, any>, options?: AsyncSagaOptions<SagaArg>) {
-  const { action, pending, fulfilled, rejected } = createAsyncSagaActions<Returned, SagaArg>(typePrefix);
+export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreator: PayloadCreator<Returned, Arg>, options?: AsyncSagaOptions<Arg>) {
+  const { action, pending, fulfilled, rejected } = createAsyncSagaActions<Returned, Arg>(typePrefix);
   type TriggerAction = ReturnType<typeof action>;
 
   const asyncSaga = function* ({ payload }: TriggerAction) {
@@ -35,4 +31,12 @@ export function createAsyncSaga<Returned, SagaArg>(typePrefix: string, payloadCr
     asyncSaga,
   };
 
+}
+
+type PayloadCreator<Returned, Arg> = (arg: Arg) => Generator<any, Returned, any>;
+
+type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
+
+interface AsyncSagaOptions<Arg> {
+  condition?: Condition<Arg>,
 }
