@@ -4,21 +4,15 @@ import { put } from "redux-saga/effects";
 export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreator: PayloadCreator<Returned, Arg>, options?: AsyncSagaOptions<Arg>) {
   const { action, pending, fulfilled, rejected } = createAsyncSagaActions<Returned, Arg>(typePrefix);
   type TriggerAction = ReturnType<typeof action>;
-
+  const canExecute = canExecuteHof(options?.condition);
   const asyncSaga = function* ({ payload }: TriggerAction) {
-    const execute = options?.condition ? yield* options?.condition(payload) : true;
+    const execute = yield* canExecute(payload);
     if (!execute) {
       return;
     }
     yield put(pending(payload));
     try {
-      const payloadGenerator = payloadCreator(payload);
-      let next = payloadGenerator.next();
-      while (!next.done) {
-        const tmp: unknown = yield next.value;
-        next = payloadGenerator.next(tmp);
-      }
-      const result = next.value;
+      const result = yield* payloadCreator(payload);
       yield put(fulfilled(payload, result));
     } catch (err) {
       yield put(rejected(payload, err));
@@ -33,10 +27,16 @@ export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreato
 
 }
 
-type PayloadCreator<Returned, Arg> = (arg: Arg) => Generator<any, Returned, any>;
+export type PayloadCreator<Returned, Arg> = (arg: Arg) => Generator<any, Returned, any>;
 
-type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
+export type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
 
-interface AsyncSagaOptions<Arg> {
+export interface AsyncSagaOptions<Arg> {
   condition?: Condition<Arg>,
+}
+
+function canExecuteHof<Arg>(condition?: Condition<Arg>): Condition<Arg> {
+  return function* (arg: Arg) {
+    return condition !== undefined ? yield* condition(arg) : true;
+  }
 }
