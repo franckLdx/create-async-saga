@@ -19,7 +19,9 @@ describe('createAsyncSaga', () => {
           type: `${typePrefix}/fulfilled`,
           payload: message,
           meta: { arg: undefined }
-        });
+        })
+        .next()
+        .isDone();
     });
 
     it('Should execute failed liefecycle', () => {
@@ -38,7 +40,9 @@ describe('createAsyncSaga', () => {
           type: `${typePrefix}/rejected`,
           payload: error,
           meta: { arg: undefined }
-        });
+        })
+        .next()
+        .isDone();
     });
   });
   describe('condition', () => {
@@ -64,7 +68,9 @@ describe('createAsyncSaga', () => {
           type: `${typePrefix}/fulfilled`,
           payload: message,
           meta: { arg: undefined }
-        });
+        })
+        .next()
+        .isDone();
     });
     it('should not execute saga', () => {
       const asyncSaga = createAsyncSaga(
