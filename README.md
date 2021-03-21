@@ -1,5 +1,5 @@
 # create-async-saga
-Dedicated to the users of redux-toolkit and redux-saga, it is like createAsyncThunk, but using generator instead of asynchronous callback.
+For those that use both [redux-toolkit](https://redux-toolkit.js.org/) and [redux-saga](https://redux-saga.js.org/), it is like createAsyncThunk, but using generator instead of asynchronous callback.
 
 createAsyncSaga accepts a Redux action type string and generator function. It generates lifecycle action types based on the action type prefix that you pass in, and returns an object:
 
@@ -74,13 +74,13 @@ type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
     When `typePrefix` is `users/fetch` actions types are `users/fetch`, `users/fetch/pending`, `users/fetch/fulfilled` and `users/fetch/rejected`
 
 * `payloadCreator`: a generator that __*returns*__ the payload to be put in `fulfilled` action. It can __*yield*__ any effects it needs.
-```javascript
-  function* (userId: string) {
-    const user: User = yield call(fetchUser, userId); // yield an effect
-    return user; // returns the result
-  },
-```
-A `payloadCreator` can receive an arg. If you need to pass in multiple values, pass them together in an object when you dispatch the action.
+    ```javascript
+      function* (userId: string) {
+        const user: User = yield call(fetchUser, userId); // yield an effect
+        return user; // returns the result
+      },
+    ```
+    A `payloadCreator` can receive an arg. If you need to pass in multiple values, pass them together in an object when you dispatch the action.
 
  * `options`: an object with (currently) one optional field (mode fiemd will be added in the coming releases):
     * condition?: Condition<Arg>: a generator that can be used to skip execution of the payload creator. It can __*yield*__ any effects but it __*returns*__ a boolean.
