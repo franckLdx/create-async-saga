@@ -1,17 +1,20 @@
 import { SerializedError } from "@reduxjs/toolkit"
 
-export const errToSerializedError = (err: any, typePrefix: string): SerializedError => {
-  const serializedError: SerializedError = {
-    message: err.message ?? `Unexpected error while execution a payload genetator for ${typePrefix}`,
-  };
-  if (err.name !== undefined) {
-    serializedError.name = err.name;
+const serializedErrorField = (field: keyof SerializedError, serializedError: SerializedError, error: any) => {
+  const value = error[field];
+  if (value !== undefined && typeof value === "string") {
+    serializedError[field] = value;
   }
-  if (err.code !== undefined) {
-    serializedError.code = err.code;
-  }
-  if (err.stack !== undefined) {
-    serializedError.stack = err.stack;
+}
+
+export const toSerializedError = (error: any, typePrefix: string): SerializedError => {
+  const serializedError: SerializedError = {};
+  serializedErrorField('name', serializedError, error);
+  serializedErrorField('code', serializedError, error);
+  serializedErrorField('stack', serializedError, error);
+  serializedErrorField('message', serializedError, error);
+  if (!serializedError.message) {
+    serializedError.message = `Unexpected error while execution a payload genetator for ${typePrefix}`;
   }
   return serializedError;
 };

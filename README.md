@@ -88,7 +88,7 @@ type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
 ## Testing
 One can test the payload generator only or the saga returned by createAsyncSaga, although the full saga requires more stuff. In both case, test can be written using any Saga [tests receipes](https://redux-saga.js.org/docs/advanced/Testing).
 
-A generator payload test (using [redux-saga-test-plan](https://github.com/jfairbank/redux-saga-test-plan):
+A generator payload test (using [redux-saga-test-plan](https://github.com/jfairbank/redux-saga-test-plan)):
 ```javascript
 it('Test payload generator', () => {
   const user: User = {
@@ -103,7 +103,7 @@ it('Test payload generator', () => {
 });
 ```
 
-A full saga test (still using [redux-saga-test-plan](https://github.com/jfairbank/redux-saga-test-plan):
+A full saga test (still using [redux-saga-test-plan](https://github.com/jfairbank/redux-saga-test-plan)):
 ```javascript
 const fetchUserSaga = createAsyncSaga(
   'users/fetch',
@@ -133,5 +133,5 @@ it('Test full saga', () => {
 This lib is new, and is missing some advanced functionalities (they will be added in the coming releases):
   * dispatchConditionRejection is missing in options
   * requestId is missing in meta
-  * error may not be a real SerializedError
+  * ~~error may not be a real SerializedError~~ Fix in release 1.0.2
   

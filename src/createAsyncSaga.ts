@@ -1,6 +1,6 @@
 import { createAsyncSagaActions } from "./tools/toolkitActions";
 import { put } from "redux-saga/effects";
-import { errToSerializedError } from "./tools/error";
+import { toSerializedError } from "./tools/error";
 
 export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreator: PayloadCreator<Returned, Arg>, options?: AsyncSagaOptions<Arg>) {
   const { action, pending, fulfilled, rejected } = createAsyncSagaActions<Returned, Arg>(typePrefix);
@@ -16,7 +16,7 @@ export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreato
       const result = yield* payloadCreator(payload);
       yield put(fulfilled(payload, result));
     } catch (err) {
-      const serializedError = errToSerializedError(err, typePrefix);
+      const serializedError = toSerializedError(err, typePrefix);
       yield put(rejected(payload, serializedError));
     }
   }
