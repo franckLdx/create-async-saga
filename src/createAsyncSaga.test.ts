@@ -1,5 +1,6 @@
 import { createAsyncSaga } from './createAsyncSaga';
 import { testSaga } from 'redux-saga-test-plan';
+import { SerializedError } from '@reduxjs/toolkit';
 
 describe('createAsyncSaga', () => {
   describe('lifecycle', () => {
@@ -27,6 +28,11 @@ describe('createAsyncSaga', () => {
     it('Should execute failed liefecycle', () => {
       const typePrefix = "SagaAfrica";
       const error = new Error("BOOM");
+      const serializedError: SerializedError = {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      }
       const asyncSaga = createAsyncSaga(typePrefix, function* () { throw error; });
       testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined })
         .next()
@@ -38,7 +44,7 @@ describe('createAsyncSaga', () => {
         .next()
         .put({
           type: `${typePrefix}/rejected`,
-          payload: error,
+          payload: serializedError,
           meta: { arg: undefined }
         })
         .next()
