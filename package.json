@@ -1,6 +1,6 @@
 {
   "name": "create-async-saga",
-  "version": "1.0.2",
+  "version": "1.0.4",
   "description": "Like readux-toolkit's createAsyncThunk, but for saga",
   "main": "./dist/index.js",
   "repository": "https://github.com/franckLdx/create-async-saga.git",
