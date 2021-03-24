@@ -21,4 +21,23 @@ describe('Convert an error to a serialzed error', () => {
     const actualSerializedError = toSerializedError({}, typePrefix);
     expect(actualSerializedError).toStrictEqual(expectedSerializedError);
   })
+
+  it('Convert a string', () => {
+    const typePrefix = 'fooBar';
+    const message = "BOOM";
+    const expectedSerializedError: SerializedError = {
+      message,
+    };
+    const actualSerializedError = toSerializedError(message, typePrefix);
+    expect(actualSerializedError).toStrictEqual(expectedSerializedError);
+  })
+
+  it('Should work with a null error', () => {
+    const typePrefix = 'fooBar';
+    const expectedSerializedError: SerializedError = {
+      message: `Unexpected error while execution a payload genetator for ${typePrefix}`,
+    };
+    const actualSerializedError = toSerializedError(null, typePrefix);
+    expect(actualSerializedError).toStrictEqual(expectedSerializedError);
+  })
 });
