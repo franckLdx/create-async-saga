@@ -70,6 +70,11 @@ function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreator: Payl
 
 type PayloadCreator<Returned, Arg> = (arg: Arg) => Generator<any, Returned, any>;
 
+interface AsyncSagaOptions<Arg> {
+  condition?: Condition<Arg>,
+  dispatchConditionRejection?: boolean,
+}
+
 type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
 ```
 * `Returned` is the return type of the playlod generator and `Arg` is the arguments type of the payload creator.
@@ -86,8 +91,9 @@ type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
     ```
     A `payloadCreator` can receive an arg. If you need to pass in multiple values, pass them together in an object when you dispatch the action.
 
-* `options`: an object with (currently) one optional field (mode fields will be added in the coming releases):
-    * condition?: Condition<Arg>: a generator that can be used to skip execution of the payload creator. It can __*yield*__ any effects but it __*returns*__ a boolean.
+* `options`: an object with the following optional fields:
+    * `condition`:  a generator that can be used to skip execution of the payload creator. It can __*yield*__ any effects but it __*returns*__ a boolean. It receives arg payload creator as argument.
+    * `dispatchConditionRejection`: by default if `condition` returns false, nothing is dispatched. When `dispatchConditionRejection` is set to true a "rejected" action is dispatched with meta.condition set to true.
 
 ### Actions
 Actions are made of action itself, with is dispatched to trigger the async execution, and of createAsyncThunk's lifecycle actions: `pending`, `fulfilled` and `rejected`.
@@ -130,7 +136,8 @@ Actions are made of action itself, with is dispatched to trigger the async execu
       payload: error, // a SerializedError made from what the payload creator thrown 
       meta: {
         arg, // object that contains the paylod creator arguments
-        requestId // id generated 
+        requestId // id generated
+        condition // true if rejected has been dispatched because condition has return false
       }
     }
   ```
