@@ -35,13 +35,14 @@ it('Test full saga', () => {
     name: "John doe",
   };
   const action = fetchUserSaga.action(user.id);
+  const requestId = action.meta.requestId;
   testSaga(fetchUserSaga.asyncSaga, action)
     .next()
-    .put(fetchUserSaga.pending(user.id))
+    .put(fetchUserSaga.pending(user.id, requestId))
     .next()
     .call(fetchUser, user.id)
     .next(user)
-    .put(fetchUserSaga.fulfilled(user.id, user))
+    .put(fetchUserSaga.fulfilled(user.id, requestId, user))
     .next()
     .isDone();
 });

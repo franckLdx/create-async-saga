@@ -6,18 +6,21 @@ export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreato
   const { action, pending, fulfilled, rejected } = createAsyncSagaActions<Returned, Arg>(typePrefix);
   type TriggerAction = ReturnType<typeof action>;
   const canExecute = canExecuteHof(options?.condition);
-  const asyncSaga = function* ({ payload }: TriggerAction) {
+
+  const asyncSaga = function* ({ payload, meta }: TriggerAction) {
     const execute = yield* canExecute(payload);
     if (!execute) {
       return;
     }
-    yield put(pending(payload));
+
+    const requestId = meta.requestId;
+    yield put(pending(payload, meta.requestId));
     try {
       const result = yield* payloadCreator(payload);
-      yield put(fulfilled(payload, result));
+      yield put(fulfilled(payload, requestId, result));
     } catch (err) {
       const serializedError = toSerializedError(err, typePrefix);
-      yield put(rejected(payload, serializedError));
+      yield put(rejected(payload, requestId, serializedError));
     }
   }
 

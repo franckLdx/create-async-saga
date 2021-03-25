@@ -6,7 +6,9 @@
   "repository": "https://github.com/franckLdx/create-async-saga.git",
   "author": "<franck.ledoux.pro@gmail.com>",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "nanoid": "^3.1.22"
+  },
   "devDependencies": {
     "@types/jest": "^26.0.21",
     "eslint": "^7.22.0",

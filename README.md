@@ -5,7 +5,7 @@ createAsyncSaga accepts a Redux action type string and generator function. It ge
 
 ```javascript
 {
-  asyncSaga,  // a saga that will run the generator and dispatch the lifecycle actions.
+  asyncSaga,  // a saga that will run the payload creator and dispatch the lifecycle actions.
   action,     // an action creator, creates the action to dispatch for executing the saga
   actionType, // the action's type
   pending, fulfilled, rejected // actions creator for lifecycle actions
@@ -61,6 +61,10 @@ createSlice({
 
 ---
 ## API
+
+Release 2.0.0 includes requestId in actions. This implies a modification in actions creator interface, which is a breaking change.
+This impact only code that creates action by itself (which is probably test including full saga if any).
+
 ```javascript
 function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreator: PayloadCreator<Returned, Arg>, options?: AsyncSagaOptions<Arg>)
 
@@ -68,10 +72,10 @@ type PayloadCreator<Returned, Arg> = (arg: Arg) => Generator<any, Returned, any>
 
 type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
 ```
-`Returned` is the return type of the playlod generator and `Arg` is the arguments type of the payload generator.
+* `Returned` is the return type of the playlod generator and `Arg` is the arguments type of the payload creator.
 * `typePrefix`: prefix for generated Redux action type constants.
 
-    When `typePrefix` is `users/fetch` actions types are `users/fetch`, `users/fetch/pending`, `users/fetch/fulfilled` and `users/fetch/rejected`
+    When `typePrefix` is `users/fetch` actions types are `users/fetch`, `users/fetch/pending`, `users/fetch/fulfilled` and `users/fetch/rejected`.
 
 * `payloadCreator`: a generator that __*returns*__ the payload to be put in `fulfilled` action. It can __*yield*__ any effects it needs.
     ```javascript
@@ -82,8 +86,55 @@ type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
     ```
     A `payloadCreator` can receive an arg. If you need to pass in multiple values, pass them together in an object when you dispatch the action.
 
- * `options`: an object with (currently) one optional field (mode fiemd will be added in the coming releases):
+* `options`: an object with (currently) one optional field (mode fields will be added in the coming releases):
     * condition?: Condition<Arg>: a generator that can be used to skip execution of the payload creator. It can __*yield*__ any effects but it __*returns*__ a boolean.
+
+### Actions
+Actions are made of action itself, with is dispatched to trigger the async execution, and of createAsyncThunk's lifecycle actions: `pending`, `fulfilled` and `rejected`.
+  * `action`:
+    ```javascript
+    {
+      type: `typePrefix`, // the typePrefix is given to createAsyncSaga
+      payload: arg, // object that contains the paylod creator arguments 
+      meta: {
+        requestId: string // a uniqe id generatted for each execution
+      }
+    }
+    ```
+  * `pending`:
+    ```javascript
+    {
+      type: `typePrefix`/pending, // the typePrefix is given to createAsyncSaga
+      payload: undefined, // object that contains the paylod creator arguments 
+      meta: {
+        arg, // object that contains the paylod creator arguments
+        requestId // id generated 
+      }
+    }
+    ```
+  * `fulfilled`:
+  ```javascript
+    {
+      type: `typePrefix`/fulfilled, // the typePrefix is given to createAsyncSaga
+      payload: returned, // payload creator returned value 
+      meta: {
+        arg, // object that contains the paylod creator arguments
+        requestId // id generated 
+      }
+    }
+  ```
+  * `rejected`:
+  ```javascript
+    {
+      type: `typePrefix`/rejected, // the typePrefix is given to createAsyncSaga
+      payload: error, // a SerializedError made from what the payload creator thrown 
+      meta: {
+        arg, // object that contains the paylod creator arguments
+        requestId // id generated 
+      }
+    }
+  ```
+
 ---
 ## Testing
 One can test the payload generator only or the saga returned by createAsyncSaga, although the full saga requires more stuff. In both case, test can be written using any Saga [tests receipes](https://redux-saga.js.org/docs/advanced/Testing).
@@ -116,13 +167,14 @@ it('Test full saga', () => {
     name: "John doe",
   };
   const action = fetchUserSaga.action(user.id);
+  const requestId = action.meta.requestId;
   testSaga(fetchUserSaga.asyncSaga, action)
     .next()
-    .put(fetchUserSaga.pending(user.id))
+    .put(fetchUserSaga.pending(user.id, requestId))
     .next()
     .call(fetchUser, user.id)
     .next(user)
-    .put(fetchUserSaga.fulfilled(user.id, user))
+    .put(fetchUserSaga.fulfilled(user.id, requestId, user))
     .next()
     .isDone();
 });
@@ -132,6 +184,6 @@ it('Test full saga', () => {
 ## Known limitations & issues
 This lib is new, and is missing some advanced functionalities (they will be added in the coming releases):
   * dispatchConditionRejection is missing in options
-  * requestId is missing in meta
+  * ~~requestId is missing in meta~~ Fix in release 2.0.0
   * ~~error may not be a real SerializedError~~ Fix in release 1.0.2
   

@@ -4,25 +4,37 @@ describe('Should create ations', () => {
   test('Should create ations with no arg nor payload', () => {
     const typePrefix = 'testAction';
     const { action, pending, fulfilled, rejected } = createAsyncSagaActions(typePrefix);
-    expect(action()).toStrictEqual({
+    const triggerAction = action();
+    const requestId = triggerAction.meta.requestId;
+    expect(triggerAction).toStrictEqual({
       type: typePrefix,
-      payload: undefined
+      payload: undefined,
+      meta: { requestId }
     });
-    expect(pending()).toStrictEqual({
+    expect(pending(undefined, requestId)).toStrictEqual({
       type: `${typePrefix}/pending`,
       payload: undefined,
-      meta: { arg: undefined }
+      meta: {
+        arg: undefined,
+        requestId
+      }
     });
-    expect(fulfilled()).toStrictEqual({
+    expect(fulfilled(undefined, requestId)).toStrictEqual({
       type: `${typePrefix}/fulfilled`,
       payload: undefined,
-      meta: { arg: undefined }
+      meta: {
+        arg: undefined,
+        requestId
+      }
     });
     const error = new Error("BOOM");
-    expect(rejected(undefined, error)).toStrictEqual({
+    expect(rejected(undefined, requestId, error)).toStrictEqual({
       type: `${typePrefix}/rejected`,
       payload: error,
-      meta: { arg: undefined }
+      meta: {
+        arg: undefined,
+        requestId
+      }
     });
   });
 
@@ -35,25 +47,37 @@ describe('Should create ations', () => {
     };
 
     const { action, pending, fulfilled, rejected } = createAsyncSagaActions<typeof payload, typeof arg>(typePrefix);
-    expect(action(arg)).toStrictEqual({
+    const triggerAction = action(arg);
+    const requestId = triggerAction.meta.requestId;
+    expect(triggerAction).toStrictEqual({
       type: typePrefix,
-      payload: arg
+      payload: arg,
+      meta: { requestId }
     });
-    expect(pending(arg)).toStrictEqual({
+    expect(pending(arg, requestId)).toStrictEqual({
       type: `${typePrefix}/pending`,
       payload: undefined,
-      meta: { arg }
+      meta: {
+        arg,
+        requestId
+      }
     });
-    expect(fulfilled(arg, payload)).toStrictEqual({
+    expect(fulfilled(arg, requestId, payload)).toStrictEqual({
       type: `${typePrefix}/fulfilled`,
       payload,
-      meta: { arg }
+      meta: {
+        arg,
+        requestId
+      }
     });
     const error = new Error("BOOM");
-    expect(rejected(arg, error)).toStrictEqual({
+    expect(rejected(arg, requestId, error)).toStrictEqual({
       type: `${typePrefix}/rejected`,
       payload: error,
-      meta: { arg }
+      meta: {
+        arg,
+        requestId
+      }
     });
   });
 

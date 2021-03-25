@@ -8,18 +8,25 @@ describe('createAsyncSaga', () => {
       const typePrefix = "SagaAfrica";
       const message = 'hello world';
       const asyncSaga = createAsyncSaga(typePrefix, function* () { return message });
-      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined })
+      const requestId = "123";
+      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined, meta: { requestId } })
         .next()
         .put({
           type: `${typePrefix}/pending`,
           payload: undefined,
-          meta: { arg: undefined }
+          meta: {
+            arg: undefined,
+            requestId
+          }
         })
         .next()
         .put({
           type: `${typePrefix}/fulfilled`,
           payload: message,
-          meta: { arg: undefined }
+          meta: {
+            arg: undefined,
+            requestId
+          }
         })
         .next()
         .isDone();
@@ -34,23 +41,31 @@ describe('createAsyncSaga', () => {
         stack: error.stack
       }
       const asyncSaga = createAsyncSaga(typePrefix, function* () { throw error; });
-      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined })
+      const requestId = "123";
+      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined, meta: { requestId } })
         .next()
         .put({
           type: `${typePrefix}/pending`,
           payload: undefined,
-          meta: { arg: undefined }
+          meta: {
+            arg: undefined,
+            requestId
+          }
         })
         .next()
         .put({
           type: `${typePrefix}/rejected`,
           payload: serializedError,
-          meta: { arg: undefined }
+          meta: {
+            arg: undefined,
+            requestId
+          }
         })
         .next()
         .isDone();
     });
   });
+
   describe('condition', () => {
     const typePrefix = "SagaAfrica";
     const message = 'hello world';
@@ -62,18 +77,25 @@ describe('createAsyncSaga', () => {
         doMessage,
         { condition: function* () { return true } }
       );
-      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined })
+      const requestId = "123";
+      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined, meta: { requestId } })
         .next()
         .put({
           type: `${typePrefix}/pending`,
           payload: undefined,
-          meta: { arg: undefined }
+          meta: {
+            arg: undefined,
+            requestId
+          }
         })
         .next()
         .put({
           type: `${typePrefix}/fulfilled`,
           payload: message,
-          meta: { arg: undefined }
+          meta: {
+            arg: undefined,
+            requestId
+          }
         })
         .next()
         .isDone();
@@ -84,7 +106,8 @@ describe('createAsyncSaga', () => {
         doMessage,
         { condition: function* () { return false } }
       );
-      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined })
+      const requestId = "123";
+      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined, meta: { requestId } })
         .next()
         .isDone();
     });
