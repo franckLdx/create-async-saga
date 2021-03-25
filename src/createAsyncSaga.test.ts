@@ -1,6 +1,7 @@
 import { createAsyncSaga } from './createAsyncSaga';
 import { testSaga } from 'redux-saga-test-plan';
 import { SerializedError } from '@reduxjs/toolkit';
+import { ConditionError } from './tools/error';
 
 describe('createAsyncSaga', () => {
   describe('lifecycle', () => {
@@ -58,7 +59,8 @@ describe('createAsyncSaga', () => {
           payload: serializedError,
           meta: {
             arg: undefined,
-            requestId
+            requestId,
+            condition: false,
           }
         })
         .next()
@@ -100,14 +102,57 @@ describe('createAsyncSaga', () => {
         .next()
         .isDone();
     });
-    it('should not execute saga', () => {
+
+    it('should not execute saga and should not dispatch rejected (dispatchConditionRejection is undefined)', () => {
       const asyncSaga = createAsyncSaga(
         typePrefix,
         doMessage,
-        { condition: function* () { return false } }
+        {
+          condition: function* () { return false },
+        }
       );
       const requestId = "123";
       testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined, meta: { requestId } })
+        .next()
+        .isDone();
+    });
+
+    it('should not execute saga and should not dispatch rejected (dispatchConditionRejection is false)', () => {
+      const asyncSaga = createAsyncSaga(
+        typePrefix,
+        doMessage,
+        {
+          condition: function* () { return false },
+          dispatchConditionRejection: false,
+        }
+      );
+      const requestId = "123";
+      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined, meta: { requestId } })
+        .next()
+        .isDone();
+    });
+
+    it('should not execute saga and should dispatch rejected (dispatchConditionRejection is true)', () => {
+      const asyncSaga = createAsyncSaga(
+        typePrefix,
+        doMessage,
+        {
+          condition: function* () { return false },
+          dispatchConditionRejection: true,
+        }
+      );
+      const requestId = "123";
+      testSaga(asyncSaga.asyncSaga, { type: typePrefix, payload: undefined, meta: { requestId } })
+        .next()
+        .put({
+          type: `${typePrefix}/rejected`,
+          payload: new ConditionError(),
+          meta: {
+            arg: undefined,
+            requestId,
+            condition: true,
+          }
+        })
         .next()
         .isDone();
     });

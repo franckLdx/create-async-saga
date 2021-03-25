@@ -184,6 +184,7 @@ it('Test full saga', () => {
 ## Known limitations & issues
 This lib is new, and is missing some advanced functionalities (they will be added in the coming releases):
   * dispatchConditionRejection is missing in options
-  * ~~requestId is missing in meta~~ Fix in release 2.0.0
-  * ~~error may not be a real SerializedError~~ Fix in release 1.0.2
+  * When the async saga is cancelled a rejected action with meta.aborted===true should be thrown
+  * ~~requestId is missing in meta~~ Fixed in release 2.0.0
+  * ~~error may not be a real SerializedError~~ Fixed in release 1.0.2
   

@@ -1,6 +1,6 @@
-import { createAsyncSagaActions } from "./tools/toolkitActions";
+import { createAsyncSagaActions } from "./tools/actions";
 import { put } from "redux-saga/effects";
-import { toSerializedError } from "./tools/error";
+import { ConditionError, toSerializedError } from "./tools/error";
 
 export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreator: PayloadCreator<Returned, Arg>, options?: AsyncSagaOptions<Arg>) {
   const { action, pending, fulfilled, rejected } = createAsyncSagaActions<Returned, Arg>(typePrefix);
@@ -8,12 +8,15 @@ export function createAsyncSaga<Returned, Arg>(typePrefix: string, payloadCreato
   const canExecute = canExecuteHof(options?.condition);
 
   const asyncSaga = function* ({ payload, meta }: TriggerAction) {
+    const requestId = meta.requestId;
     const execute = yield* canExecute(payload);
     if (!execute) {
+      if (options?.dispatchConditionRejection) {
+        yield put(rejected(payload, requestId, new ConditionError()));
+      }
       return;
     }
 
-    const requestId = meta.requestId;
     yield put(pending(payload, meta.requestId));
     try {
       const result = yield* payloadCreator(payload);
@@ -38,6 +41,7 @@ export type Condition<Arg> = (arg: Arg) => Generator<any, boolean, any>;
 
 export interface AsyncSagaOptions<Arg> {
   condition?: Condition<Arg>,
+  dispatchConditionRejection?: boolean,
 }
 
 function canExecuteHof<Arg>(condition?: Condition<Arg>): Condition<Arg> {

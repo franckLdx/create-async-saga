@@ -1,4 +1,5 @@
 import { createAction, nanoid, SerializedError } from "@reduxjs/toolkit";
+import { ConditionError } from "./error";
 
 export interface Meta<Arg> {
   arg: Arg,
@@ -6,7 +7,7 @@ export interface Meta<Arg> {
 }
 
 export function createAsyncSagaActions<Returned = void, Arg = void>(typePrefix: string) {
-  const meta = (arg: Arg, requestId: string): { meta: Meta<Arg> } => ({ meta: { arg, requestId } });
+  const getStdMeta = (arg: Arg, requestId: string): { meta: Meta<Arg> } => ({ meta: { arg, requestId } });
 
   return {
     action: createAction(typePrefix, (arg: Arg) => ({
@@ -17,16 +18,26 @@ export function createAsyncSagaActions<Returned = void, Arg = void>(typePrefix: 
     })),
     pending: createAction(`${typePrefix}/pending`, (arg: Arg, requestId: string) => ({
       payload: undefined,
-      ...meta(arg, requestId)
+      ...getStdMeta(arg, requestId)
     })),
     fulfilled: createAction(`${typePrefix}/fulfilled`, (arg: Arg, requestId: string, result: Returned) => ({
       payload: result,
-      ...meta(arg, requestId)
+      ...getStdMeta(arg, requestId)
     })),
-    rejected: createAction(`${typePrefix}/rejected`, (arg: Arg, requestId: string, error: SerializedError) => ({
-      payload: error,
-      ...meta(arg, requestId)
-    })),
+    rejected: createAction(`${typePrefix}/rejected`, (arg: Arg, requestId: string, error: SerializedError) => {
+      const metaData = getStdMeta(arg, requestId);
+      const rejectedMetaData = {
+        ...metaData,
+        meta: {
+          ...metaData.meta,
+          condition: error instanceof ConditionError,
+        }
+      }
+      return {
+        payload: error,
+        ...rejectedMetaData
+      }
+    }),
   }
 };
 

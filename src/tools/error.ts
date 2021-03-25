@@ -26,3 +26,5 @@ export const toSerializedError = (error: any, typePrefix: string): SerializedErr
 
   return serializedError;
 };
+
+export class ConditionError implements SerializedError { }

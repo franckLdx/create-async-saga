@@ -1,4 +1,5 @@
-import { createAsyncSagaActions } from './toolkitActions';
+import { createAsyncSagaActions } from './actions';
+import { ConditionError } from './error';
 
 describe('Should create ations', () => {
   test('Should create ations with no arg nor payload', () => {
@@ -33,7 +34,8 @@ describe('Should create ations', () => {
       payload: error,
       meta: {
         arg: undefined,
-        requestId
+        requestId,
+        condition: false,
       }
     });
   });
@@ -76,7 +78,18 @@ describe('Should create ations', () => {
       payload: error,
       meta: {
         arg,
-        requestId
+        requestId,
+        condition: false,
+      }
+    });
+    const conditionError = new ConditionError();
+    expect(rejected(arg, requestId, conditionError)).toStrictEqual({
+      type: `${typePrefix}/rejected`,
+      payload: conditionError,
+      meta: {
+        arg,
+        requestId,
+        condition: true,
       }
     });
   });
