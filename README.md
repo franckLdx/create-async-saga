@@ -119,7 +119,7 @@ Actions are made of action itself, with is dispatched to trigger the async execu
     }
     ```
   * `fulfilled`:
-  ```javascript
+    ```javascript
     {
       type: `typePrefix`/fulfilled, // the typePrefix is given to createAsyncSaga
       payload: returned, // payload creator returned value 
@@ -128,9 +128,9 @@ Actions are made of action itself, with is dispatched to trigger the async execu
         requestId // id generated 
       }
     }
-  ```
+    ```
   * `rejected`:
-  ```javascript
+    ```javascript
     {
       type: `typePrefix`/rejected, // the typePrefix is given to createAsyncSaga
       payload: error, // a SerializedError made from what the payload creator thrown 
@@ -140,7 +140,7 @@ Actions are made of action itself, with is dispatched to trigger the async execu
         condition // true if rejected has been dispatched because condition has return false
       }
     }
-  ```
+    ```
 
 ---
 ## Testing
@@ -190,7 +190,7 @@ it('Test full saga', () => {
 ---
 ## Known limitations & issues
 This lib is new, and is missing some advanced functionalities (they will be added in the coming releases):
-  * dispatchConditionRejection is missing in options
+  * ~~dispatchConditionRejection~~ is missing in options Fixed in release 2.1.0
   * When the async saga is cancelled a rejected action with meta.aborted===true should be thrown
   * ~~requestId is missing in meta~~ Fixed in release 2.0.0
   * ~~error may not be a real SerializedError~~ Fixed in release 1.0.2
