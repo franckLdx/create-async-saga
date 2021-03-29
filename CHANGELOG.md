@@ -1,3 +1,7 @@
+# 2.1.0
+Add dispatchConditionRejection feature. Rejected action now has a condition property in its meta. condition===true
+when async saga is rejected because its condition is false. 
+
 # 2.0.0
 Add a requestId to actions. This include modification of actions creator interface, which introduce a breaking change.
 requestId is generated using nanoid, like createAsyncThunk does.
