@@ -1,3 +1,12 @@
+# 2.1.3
+Update dependencies
+
+# 2.1.2
+Update dependencies
+
+# 2.1.1
+Update dependencies
+
 # 2.1.0
 Add dispatchConditionRejection feature. Rejected action now has a condition property in its meta. condition===true
 when async saga is rejected because its condition is false. 
