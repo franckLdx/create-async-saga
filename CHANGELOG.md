@@ -1,3 +1,6 @@
+# 2.1.4
+Update dependencies & fix fulfilled action type
+
 # 2.1.3
 Update dependencies
 
