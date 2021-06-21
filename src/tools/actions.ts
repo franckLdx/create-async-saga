@@ -1,4 +1,4 @@
-import { createAction, nanoid, SerializedError } from "@reduxjs/toolkit";
+import { createAction, nanoid, PrepareAction, SerializedError } from "@reduxjs/toolkit";
 import { ConditionError } from "./error";
 
 export interface Meta<Arg> {
@@ -20,7 +20,7 @@ export function createAsyncSagaActions<Returned = void, Arg = void>(typePrefix: 
       payload: undefined,
       ...getStdMeta(arg, requestId)
     })),
-    fulfilled: createAction(`${typePrefix}/fulfilled`, (arg: Arg, requestId: string, result: Returned) => ({
+    fulfilled: createAction<PrepareAction<Returned>>(`${typePrefix}/fulfilled`, (arg: Arg, requestId: string, result: Returned) => ({
       payload: result,
       ...getStdMeta(arg, requestId)
     })),
