@@ -1,37 +1,52 @@
 # create-async-saga
 For those that use both [redux-toolkit](https://redux-toolkit.js.org/) and [redux-saga](https://redux-saga.js.org/), it is like createAsyncThunk, but using generator instead of asynchronous callback.
 
-createAsyncSaga accepts a Redux action type string and generator function. It generates lifecycle action types based on the action type prefix that you pass in, and returns an object:
+createAsyncSaga accepts a Redux action type string and generator function. It generates lifecycle action types based on the action type prefix that you pass in, and returns an object that allow to 
+  * dispatch an action to trigger your function 
+  * update your state using a slice 
+
+## Getting started
+
+You want to load a user using an api: 
 
 ```javascript
-{
-  asyncSaga,  // a saga that will run the payload creator and dispatch the lifecycle actions.
-  action,     // an action creator, creates the action to dispatch for executing the saga
-  actionType, // the action's type
-  pending, fulfilled, rejected // actions creator for lifecycle actions
+interface User {
+  userId: number,
+  name: string;
 }
+
+const fetchUserApi = (userId: number): User => ({ userId, name: "foo" });
 ```
 
-The created saga has to be executed using the created action:
+Call createAsyncSaga and provide a generator that call the API:
 ```javascript
-export function* watchUsersRequired() {
+export const fetchUser = createAsyncSaga(
+  'users/fetch',
+  function* (userId: number) {
+    return yield call(fetchUserApi, userId)
+  }
+); 
+```
+
+fetchUser object contains action and it's type, the action to execute the saga. It has to be watched and dispatched 
+* to watch:
+```javascript
+export function* watchFetchUser() {
   yield takeEvery(fetchUser.actionType, fetchUser.asyncSaga);
 }
+// Don't forget to add this to the saga middleware: sagaMiddleware.run(watchFetchUser) 
+```
+* to dispatch:
+```javascript
+dispatch(fetchUser.action(1))
 ```
 
-Like createAsyncThunk, it does not generate any reducer functions. You should write your own reducer logic that handles these actions:
+CreateAsyncSaga dispatch a pending action when the saga start, a fulfilled action when the saga is sucessfull, and a rejected action when saga failed.
+Like with createAsyncThunk, you write your own reducer logic using those actions:
 
 ```javascript
-const fetchUser = createAsyncSaga(
-  'users/fetch',
-  function* (userId: string) {
-    const user = yield call(fetchUser, userId);
-    return user;
-  }
-);
-
 createSlice({
-  name: ...,
+  name: 'user',
   initialState: { ... },
   reducers: { ... },
   extraReducers(builder) {
@@ -52,6 +67,7 @@ createSlice({
       fetchUser.rejected,
       (state) => {
         state.fetchStatus = "rejected"; 
+        // action.payload contains error information
       }
     );
   }
