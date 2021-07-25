@@ -1,3 +1,9 @@
+# 2.1.6
+Update dependencies & Readme
+
+# 2.1.5
+Update dependencies & Readme
+
 # 2.1.4
 Update dependencies & fix fulfilled action type
 
