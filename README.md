@@ -6,6 +6,7 @@ createAsyncSaga accepts a Redux action type string and generator function. It ge
   * update your state using a slice 
 
 ## Getting started
+!! You must have redux-toolkit & redux-saga installed and configured 
 
 You want to load a user using an api: 
 
