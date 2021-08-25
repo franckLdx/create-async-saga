@@ -7,17 +7,17 @@
   "author": "<franck.ledoux.pro@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "nanoid": "3.1.23"
+    "nanoid": "3.1.25"
   },
   "devDependencies": {
-    "@types/jest": "26.0.24",
-    "eslint": "7.31.0",
+    "@types/jest": "27.0.1",
+    "eslint": "7.32.0",
     "install-peers-cli": "^2.2.0",
     "jest": "27.0.6",
     "redux-saga-test-plan": "4.0.3",
     "rimraf": "^3.0.2",
-    "ts-jest": "27.0.4",
-    "ts-node": "10.1.0",
+    "ts-jest": "27.0.5",
+    "ts-node": "10.2.1",
     "typescript": "4.3.5"
   },
   "peerDependencies": {
