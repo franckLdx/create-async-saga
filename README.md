@@ -41,6 +41,12 @@ export function* watchFetchUser() {
 ```javascript
 dispatch(fetchUser.action(1))
 ```
+* you can watch you own action:
+```javascript
+export function* watchFetchUser() {
+  yield takeEvery(myOwnAction, fetchUser.asyncSaga);
+}
+```
 
 CreateAsyncSaga dispatch a pending action when the saga start, a fulfilled action when the saga is sucessfull, and a rejected action when saga failed.
 Like with createAsyncThunk, you write your own reducer logic using those actions:
