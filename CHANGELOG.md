@@ -1,3 +1,6 @@
+# 2.1.7
+Update dependencies & Readme
+
 # 2.1.6
 Update dependencies & Readme
 
