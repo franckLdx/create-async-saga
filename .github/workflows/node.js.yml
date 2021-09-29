@@ -26,4 +26,5 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: yarn install
+    - run: npm install @reduxjs/toolkit redux-saga
     - run: yarn test
