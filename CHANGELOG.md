@@ -1,3 +1,8 @@
+# 2.1.10
+
+Update dependencies
+fix an issue: createAsyncSaga action expect a param while the provided generator has no parameter
+
 # 2.1.9
 
 Update dependencies
